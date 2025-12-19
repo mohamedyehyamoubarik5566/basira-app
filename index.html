@@ -13,10 +13,34 @@
     <link rel="stylesheet" href="./update-modal-styles.css">
     
     <!-- System Configuration - MUST BE FIRST -->
-    <script src="./system-config.js"></script>
+    <script>
+        // System Configuration - Inline to ensure availability
+        const SystemConfig = {
+            version: {
+                current: '2026.1.1',
+                apiVersion: 'v1',
+                schemaVersion: '1.0.0',
+                lastUpdate: '2024-12-19T10:00:00Z'
+            },
+            system: {
+                maintenanceMode: false,
+                sessionTimeout: 30 * 60 * 1000
+            }
+        };
+        
+        // Make globally available
+        if (typeof window !== 'undefined') {
+            window.SystemConfig = SystemConfig;
+        }
+    </script>
     
-    <!-- Core System Files -->
+    <!-- Enhanced Core System Files -->
+    <script src="./config.js"></script>
+    <script src="./security.js"></script>
+    <script src="./utils-enhanced.js"></script>
+    <script src="./performance-enhanced.js"></script>
     <script src="./database-config-simple.js"></script>
+    <script src="./clear-data.js"></script>
 
 </head>
 <body>
@@ -1646,6 +1670,33 @@
         let allPurchases = [];
         let allSuppliers = [];
         
+        // Security: Input sanitization function
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+            return input
+                .replace(/[<>"'&]/g, function(match) {
+                    const map = {
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#x27;',
+                        '&': '&amp;'
+                    };
+                    return map[match];
+                })
+                .trim()
+                .substring(0, 200); // Limit length
+        }
+        
+        // Enhanced error handling for DOM elements
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element with id '${id}' not found`);
+            }
+            return element;
+        }
+        
         // Security Check and User Info
         document.addEventListener('DOMContentLoaded', function() {
             const session = localStorage.getItem('currentUser');
@@ -1755,24 +1806,7 @@
             // Real-time subscriptions disabled in localStorage mode
         }
         
-        // Initialize sample data with validation
-        function initializeSampleData() {
-            try {
-                const clients = getClientsDatabase();
-                if (Object.keys(clients).length === 0) {
-                    // Add sample clients with pricing
-                    saveClientToDatabase('شركة النيل للمقاولات', 45, 55);
-                    saveClientToDatabase('مؤسسة البناء الحديث', 42, 52);
-                    saveClientToDatabase('شركة العمران المتطور', 48, 58);
-                    // Sample clients data added
-                }
-            } catch (error) {
-                // Error initializing sample data
-            }
-        }
-        
-        // Initialize on page load
-        initializeSampleData();
+        // تم إزالة البيانات الافتراضية - البرنامج يبدأ فارغاً
         if (window.dbManager) {
             initializeRealTime();
         }
@@ -1805,6 +1839,19 @@
                 }
             }
         });
+        
+        // إضافة مستمع لتغيير نوع المادة بعد تحميل الصفحة
+        setTimeout(() => {
+            const materialTypeInput = safeGetElement('materialType');
+            if (materialTypeInput) {
+                materialTypeInput.addEventListener('change', function() {
+                    updatePriceByClient();
+                });
+                materialTypeInput.addEventListener('input', function() {
+                    updatePriceByClient();
+                });
+            }
+        }, 1000);
 
         // Sales data management
         function getCurrentDayRange() {
@@ -2138,19 +2185,28 @@
             document.getElementById('totalClientRevenue').textContent = totalBalance.toFixed(0) + ' ج.م';
         }
 
-        function openClientModal() {
-            const modal = document.getElementById('clientModal');
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-            document.getElementById('clientModalTitle').textContent = 'إضافة عميل جديد';
-        }
+
 
         function closeClientModal() {
-            const modal = document.getElementById('clientModal');
-            modal.classList.remove('show');
+            const modal = safeGetElement('clientModal');
+            const form = safeGetElement('clientForm');
+            
+            if (modal) {
+                modal.classList.remove('show');
+            }
+            
             document.body.style.overflow = 'auto';
-            document.getElementById('clientForm').reset();
-            document.getElementById('clientForm').removeAttribute('data-edit-client');
+            
+            if (form) {
+                form.reset();
+                form.removeAttribute('data-edit-client');
+            }
+            
+            // إعادة تعيين عنوان النافذة
+            const modalTitle = safeGetElement('clientModalTitle');
+            if (modalTitle) {
+                modalTitle.textContent = 'إضافة عميل جديد';
+            }
         }
 
         function editClient(clientName) {
@@ -2229,39 +2285,70 @@
         document.getElementById('clientForm').onsubmit = function(e) {
             e.preventDefault();
             
-            const editClient = this.getAttribute('data-edit-client');
-            const clientName = document.getElementById('clientNameInput').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            const priceSen = parseFloat(document.getElementById('clientPriceSen').value);
-            const priceAdasa = parseFloat(document.getElementById('clientPriceAdasa').value);
-            const openingBalance = parseFloat(document.getElementById('clientOpeningBalance').value) || 0;
-            const notes = document.getElementById('clientNotes').value.trim();
-            
-            if (!clientName || isNaN(priceSen) || isNaN(priceAdasa)) {
-                alert('الرجاء ملء جميع الحقول المطلوبة');
-                return false;
+            try {
+                const editClient = this.getAttribute('data-edit-client');
+                const clientName = sanitizeInput(document.getElementById('clientNameInput').value.trim());
+                const phone = sanitizeInput(document.getElementById('clientPhone').value.trim());
+                const priceSen = parseFloat(document.getElementById('clientPriceSen').value);
+                const priceAdasa = parseFloat(document.getElementById('clientPriceAdasa').value);
+                const openingBalance = parseFloat(document.getElementById('clientOpeningBalance').value) || 0;
+                const notes = sanitizeInput(document.getElementById('clientNotes').value.trim());
+                
+                // التحقق من صحة البيانات
+                if (!clientName || clientName.length < 2) {
+                    showNotification('اسم العميل يجب أن يكون على الأقل حرفين', 'error');
+                    return false;
+                }
+                
+                if (isNaN(priceSen) || priceSen < 0 || isNaN(priceAdasa) || priceAdasa < 0) {
+                    showNotification('الأسعار يجب أن تكون أرقام صحيحة وموجبة', 'error');
+                    return false;
+                }
+                
+                if (Math.abs(openingBalance) > 1000000) {
+                    showNotification('رصيد البداية يجب أن يكون أقل من مليون جنيه', 'error');
+                    return false;
+                }
+                
+                const clients = getClientsDatabase();
+                
+                // التحقق من عدم تكرار اسم العميل
+                if (!editClient && clients[clientName]) {
+                    showNotification('اسم العميل موجود بالفعل', 'error');
+                    return false;
+                }
+                
+                if (editClient && editClient !== clientName) {
+                    delete clients[editClient];
+                }
+                
+                clients[clientName] = {
+                    name: clientName,
+                    phone: phone,
+                    priceSen: priceSen,
+                    priceAdasa: priceAdasa,
+                    openingBalance: openingBalance,
+                    notes: notes,
+                    lastUpdated: new Date().toISOString(),
+                    createdAt: editClient ? clients[editClient]?.createdAt : new Date().toISOString()
+                };
+                
+                // حفظ البيانات مع معالجة الأخطاء
+                const session = sessionStorage.getItem('currentUser');
+                const user = session ? JSON.parse(session) : null;
+                const companyCode = user?.companyCode || 'default';
+                
+                localStorage.setItem(`clientsDatabase_${companyCode}`, JSON.stringify(clients));
+                
+                closeClientModal();
+                loadClients();
+                showNotification(editClient ? 'تم تحديث بيانات العميل بنجاح!' : 'تم إضافة العميل بنجاح!');
+                
+            } catch (error) {
+                console.error('Error saving client:', error);
+                showNotification('حدث خطأ أثناء حفظ بيانات العميل', 'error');
             }
             
-            const clients = getClientsDatabase();
-            
-            if (editClient && editClient !== clientName) {
-                delete clients[editClient];
-            }
-            
-            clients[clientName] = {
-                name: clientName,
-                phone: phone,
-                priceSen: priceSen,
-                priceAdasa: priceAdasa,
-                openingBalance: openingBalance,
-                notes: notes,
-                lastUpdated: new Date().toISOString()
-            };
-            
-            localStorage.setItem('clientsDatabase', JSON.stringify(clients));
-            closeClientModal();
-            loadClients();
-            showNotification(editClient ? 'تم تحديث بيانات العميل!' : 'تم إضافة العميل بنجاح!');
             return false;
         };
         
@@ -3916,25 +4003,80 @@
 
         // Update price based on client selection
         function updatePriceByClient() {
-            const clientName = document.getElementById('clientName').value;
-            const priceInput = document.getElementById('pricePerMeter');
+            const clientNameInput = safeGetElement('clientName');
+            const priceInput = safeGetElement('pricePerMeter');
+            const materialTypeInput = safeGetElement('materialType');
             
+            if (!clientNameInput || !priceInput) return;
+            
+            const clientName = clientNameInput.value;
             if (!clientName) {
                 priceInput.value = '';
                 return;
             }
             
-            const clientPricing = getClientPricing(clientName);
-            // استخدام سعر السن كافتراضي
-            priceInput.value = clientPricing.priceSen || '';
-            calculateTotal();
+            try {
+                const clientPricing = getClientPricing(clientName);
+                const materialType = materialTypeInput ? materialTypeInput.value : 'سن';
+                
+                // تحديد السعر حسب نوع المادة
+                if (materialType === 'عدسة') {
+                    priceInput.value = clientPricing.priceAdasa || '';
+                } else {
+                    // استخدام سعر السن كافتراضي
+                    priceInput.value = clientPricing.priceSen || '';
+                }
+                
+                calculateTotal();
+                
+                // إشعار المستخدم بتحديث السعر
+                if (priceInput.value) {
+                    showNotification(`تم تحديث السعر تلقائياً: ${priceInput.value} ج.م`, 'success');
+                }
+            } catch (error) {
+                console.error('Error updating price by client:', error);
+                showNotification('خطأ في تحديث السعر', 'error');
+            }
         }
 
         // Update client selection to trigger price update
         function selectClient(clientName) {
-            document.getElementById('clientName').value = clientName;
-            document.getElementById('clientDropdown').style.display = 'none';
-            updatePriceByClient();
+            const clientNameInput = safeGetElement('clientName');
+            const clientDropdown = safeGetElement('clientDropdown');
+            
+            if (clientNameInput) {
+                clientNameInput.value = sanitizeInput(clientName);
+            }
+            if (clientDropdown) {
+                clientDropdown.style.display = 'none';
+            }
+            
+            // تحديث السعر بعد اختيار العميل
+            setTimeout(() => {
+                updatePriceByClient();
+            }, 100);
+        }
+        
+        // تحسين وظيفة فتح نافذة إضافة عميل
+        function openClientModal() {
+            const modal = safeGetElement('clientModal');
+            const modalTitle = safeGetElement('clientModalTitle');
+            
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            if (modalTitle) {
+                modalTitle.textContent = 'إضافة عميل جديد';
+            }
+            
+            // تنظيف النموذج
+            const form = safeGetElement('clientForm');
+            if (form) {
+                form.reset();
+                form.removeAttribute('data-edit-client');
+            }
         }
 
         // Bank & Check Management Functions

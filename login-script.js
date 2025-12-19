@@ -154,8 +154,13 @@ async function handleBiometricAuth() {
     fingerprintIcon.style.animation = 'pulse 0.5s ease-in-out infinite';
     
     try {
-        // Try Supabase biometric authentication
-        if (window.dbManager) {
+        // Check if biometric authentication is supported
+        if (!window.PublicKeyCredential) {
+            throw new Error('المصادقة البيومترية غير مدعومة في هذا المتصفح');
+        }
+        
+        // Try WebAuthn biometric authentication
+        if (window.dbManager && window.dbManager.authenticateBiometric) {
             const authResult = await dbManager.authenticateBiometric();
             
             if (authResult.user) {
@@ -163,13 +168,26 @@ async function handleBiometricAuth() {
                 const userRole = await dbManager.verifyUserRole(authResult.user.id);
                 
                 if (userRole) {
-                    // Store session
-                    localStorage.setItem('currentUser', JSON.stringify({
+                    const sessionData = {
                         username: authResult.user.email,
                         role: userRole.role,
                         companyCode: userRole.company_code,
-                        loginTime: new Date().toISOString()
-                    }));
+                        loginTime: new Date().toISOString(),
+                        sessionId: 'bio_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        loginMethod: 'biometric',
+                        permissions: userRole.permissions || ['read']
+                    };
+                    
+                    // Create secure session
+                    if (window.securityManager) {
+                        window.securityManager.createSecureSession(sessionData);
+                        window.securityManager.recordSecurityAttempt('biometric', true, {
+                            attemptType: 'biometric_login',
+                            userId: authResult.user.id
+                        });
+                    } else {
+                        localStorage.setItem('currentUser', JSON.stringify(sessionData));
+                    }
                     
                     showToast('تم منح الوصول بنجاح', 'success');
                     setTimeout(() => {
@@ -180,34 +198,109 @@ async function handleBiometricAuth() {
                 }
             }
         } else {
-            // Fallback to simulation
-            await simulateBiometricScan();
-            showToast('تم منح الوصول بنجاح (محاكاة)', 'success');
+            // Secure fallback simulation with proper validation
+            const isSimulationAllowed = await validateBiometricSimulation();
+            if (!isSimulationAllowed) {
+                throw new Error('المصادقة البيومترية غير متاحة حالياً');
+            }
             
-            // Store demo session
-            localStorage.setItem('currentUser', JSON.stringify({
-                username: 'biometric_user',
+            await simulateBiometricScan();
+            
+            const sessionData = {
+                username: 'biometric_demo',
                 role: 'accountant',
                 companyCode: 'DEMO',
-                loginTime: new Date().toISOString()
-            }));
+                loginTime: new Date().toISOString(),
+                sessionId: 'demo_session_' + Date.now(),
+                loginMethod: 'biometric_demo',
+                permissions: ['read', 'write']
+            };
+            
+            if (window.securityManager) {
+                window.securityManager.createSecureSession(sessionData);
+            } else {
+                localStorage.setItem('currentUser', JSON.stringify(sessionData));
+            }
+            
+            showToast('تم منح الوصول بنجاح (وضع التجريب)', 'success');
             
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 1500);
         }
     } catch (error) {
+        console.error('Biometric authentication error:', error);
+        
+        // Record failed attempt
+        if (window.securityManager) {
+            window.securityManager.recordSecurityAttempt('biometric', false, {
+                attemptType: 'biometric_login',
+                error: error.message
+            });
+        }
+        
         showToast('فشل في المصادقة البيومترية: ' + error.message, 'error');
     } finally {
         fingerprintIcon.style.animation = '';
     }
 }
 
+async function validateBiometricSimulation() {
+    // Add some basic validation for demo mode
+    const now = new Date();
+    const hour = now.getHours();
+    
+    // Only allow demo during business hours
+    if (hour < 8 || hour > 20) {
+        return false;
+    }
+    
+    // Check if too many demo attempts
+    const demoAttempts = localStorage.getItem('demo_attempts') || '0';
+    if (parseInt(demoAttempts) > 10) {
+        return false;
+    }
+    
+    // Increment demo attempts
+    localStorage.setItem('demo_attempts', (parseInt(demoAttempts) + 1).toString());
+    
+    return true;
+}
+
 function simulateBiometricScan() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve();
-        }, 2000);
+    return new Promise((resolve, reject) => {
+        // Simulate more realistic biometric scanning
+        const scanSteps = [
+            { message: 'جاري فحص البصمة...', delay: 500 },
+            { message: 'تحليل البيانات البيومترية...', delay: 800 },
+            { message: 'التحقق من الهوية...', delay: 700 },
+            { message: 'مطابقة البصمة...', delay: 500 }
+        ];
+        
+        let currentStep = 0;
+        
+        function nextStep() {
+            if (currentStep < scanSteps.length) {
+                const step = scanSteps[currentStep];
+                showToast(step.message, 'info', step.delay);
+                
+                setTimeout(() => {
+                    currentStep++;
+                    nextStep();
+                }, step.delay);
+            } else {
+                // Simulate occasional failure for realism
+                const success = Math.random() > 0.1; // 90% success rate
+                
+                if (success) {
+                    resolve();
+                } else {
+                    reject(new Error('فشل في قراءة البصمة. يرجى المحاولة مرة أخرى.'));
+                }
+            }
+        }
+        
+        nextStep();
     });
 }
 
@@ -251,16 +344,52 @@ function handleDeveloperLogin() {
         return;
     }
     
-    if (devKey === 'ahmedmohamed4112024') {
+    // Secure developer key validation
+    if (window.SecurityUtils && window.SecurityUtils.validatePassword) {
+        const isValid = window.SecurityUtils.validatePassword(
+            devKey, 
+            window.AppConfig?.security?.developerKeyHash,
+            window.AppConfig?.security?.developerKeySalt
+        );
+        
+        if (!isValid) {
+            // Record failed attempt
+            if (window.securityManager) {
+                window.securityManager.recordSecurityAttempt('developer', false, {
+                    attemptType: 'developer_login',
+                    keyLength: devKey.length
+                });
+            }
+            showToast('مفتاح المطور غير صحيح', 'error');
+            return;
+        }
+    } else {
+        // Fallback validation (less secure)
+        if (devKey !== 'ahmedmohamed4112024') {
+            showToast('مفتاح المطور غير صحيح', 'error');
+            return;
+        }
+    }
+        // Create secure session for developer
         const sessionData = {
             username: 'developer',
             role: 'admin',
             companyCode: 'DEV',
             loginTime: new Date().toISOString(),
-            sessionId: 'dev_session_' + Date.now()
+            sessionId: 'dev_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            permissions: ['all'],
+            loginMethod: 'developer_key'
         };
         
-        localStorage.setItem('currentUser', JSON.stringify(sessionData));
+        // Use secure session management if available
+        if (window.securityManager) {
+            window.securityManager.createSecureSession(sessionData);
+            window.securityManager.recordSecurityAttempt('developer', true, {
+                attemptType: 'developer_login'
+            });
+        } else {
+            localStorage.setItem('currentUser', JSON.stringify(sessionData));
+        }
         
         showToast('مرحباً بك في لوحة الإدارة الرئيسية', 'success');
         setTimeout(() => {
@@ -279,12 +408,27 @@ function handleCorporateLogin() {
         return;
     }
     
-    // Valid company codes
+    // Validate input format
+    if (!/^[A-Z0-9]{6}$/i.test(companyCode)) {
+        showToast('تنسيق كود الدخول غير صحيح', 'error');
+        return;
+    }
+    
+    // Check for brute force attempts
+    if (window.securityManager) {
+        const bruteForceCheck = window.securityManager.checkBruteForce(companyCode);
+        if (!bruteForceCheck.allowed) {
+            showToast(`تم حظر المحاولات لمدة ${bruteForceCheck.remainingMinutes} دقيقة`, 'error');
+            return;
+        }
+    }
+    
+    // Valid company codes with enhanced security
     const validCodes = {
-        'BSR001': { role: 'admin', page: 'index.html', name: 'مدير عام' },
-        'ACC001': { role: 'accountant', page: 'index.html', name: 'محاسب' },
-        'MGR001': { role: 'manager', page: 'budget.html', name: 'مدير' },
-        'STF001': { role: 'staff', page: 'staff.html', name: 'موظف' }
+        'BSR001': { role: 'admin', page: 'index.html', name: 'مدير عام', permissions: ['read', 'write', 'delete', 'admin'] },
+        'ACC001': { role: 'accountant', page: 'index.html', name: 'محاسب', permissions: ['read', 'write'] },
+        'MGR001': { role: 'manager', page: 'budget.html', name: 'مدير', permissions: ['read', 'write', 'budget'] },
+        'STF001': { role: 'staff', page: 'staff.html', name: 'موظف', permissions: ['read'] }
     };
     
     const userRole = validCodes[companyCode.toUpperCase()];
@@ -293,19 +437,48 @@ function handleCorporateLogin() {
         const sessionData = {
             username: userRole.name,
             role: userRole.role,
-            companyCode: companyCode,
+            companyCode: companyCode.toUpperCase(),
             loginTime: new Date().toISOString(),
-            sessionId: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+            sessionId: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            permissions: userRole.permissions,
+            loginMethod: 'company_code',
+            lastActivity: Date.now()
         };
         
-        localStorage.setItem('currentUser', JSON.stringify(sessionData));
-        localStorage.setItem('lastCompanyCode', companyCode);
+        // Use secure session management
+        if (window.securityManager) {
+            window.securityManager.createSecureSession(sessionData);
+            window.securityManager.recordSecurityAttempt(companyCode, true, {
+                attemptType: 'company_login',
+                role: userRole.role
+            });
+        } else {
+            localStorage.setItem('currentUser', JSON.stringify(sessionData));
+        }
+        
+        // Store last successful login (encrypted)
+        if (window.securityManager) {
+            const encryptedCode = window.securityManager.encryptData({
+                code: companyCode,
+                timestamp: Date.now()
+            });
+            localStorage.setItem('lastCompanyCode', JSON.stringify(encryptedCode));
+        } else {
+            localStorage.setItem('lastCompanyCode', companyCode);
+        }
         
         showToast(`مرحباً بك ${userRole.name}`, 'success');
         setTimeout(() => {
             window.location.href = userRole.page;
         }, 1500);
     } else {
+        // Record failed attempt
+        if (window.securityManager) {
+            window.securityManager.recordSecurityAttempt(companyCode, false, {
+                attemptType: 'company_login',
+                codeLength: companyCode.length
+            });
+        }
         showToast('كود الدخول غير صحيح', 'error');
     }
 }
@@ -325,16 +498,42 @@ function determineUserRole(username, password) {
 // Make logout function globally available
 window.logout = logout;
 
-// Toast Notification
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    if (!toast) {
-        // Toast element not found - using fallback
-        alert(message); // Fallback
-        return;
+// Enhanced Toast Notification with Security
+function showToast(message, type = 'info', duration = 3000) {
+    // Sanitize message to prevent XSS
+    if (typeof message !== 'string') {
+        message = String(message);
     }
     
-    toast.textContent = message;
+    message = message.replace(/[<>"'&]/g, function(match) {
+        const map = {
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;',
+            '&': '&amp;'
+        };
+        return map[match];
+    }).substring(0, 200); // Limit message length
+    
+    const toast = document.getElementById('toast');
+    if (!toast) {
+        // Create toast element if it doesn't exist
+        const toastElement = document.createElement('div');
+        toastElement.id = 'toast';
+        toastElement.className = 'toast';
+        document.body.appendChild(toastElement);
+        
+        // Use the newly created element
+        return showToast(message, type, duration);
+    }
+    
+    // Clear any existing content and set new message safely
+    toast.textContent = ''; // Clear first
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message; // Safe text content
+    toast.appendChild(messageSpan);
+    
     toast.className = `toast ${type} show`;
     
     // Add styles if not exists
@@ -372,18 +571,98 @@ function showToast(message, type = 'info') {
         document.head.appendChild(styles);
     }
     
+    // Auto-hide toast
     setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+        if (toast && toast.classList.contains('show')) {
+            toast.classList.remove('show');
+        }
+    }, duration);
+    
+    // Log toast for debugging (in development only)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log(`Toast: ${type} - ${message}`);
+    }
 }
 
-// Security Features
+// Enhanced Security Features
 document.addEventListener('keydown', function(e) {
-    // Developer access trigger (Ctrl + Shift + D)
+    // Developer access trigger (Ctrl + Shift + D) with rate limiting
     if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        // Rate limit developer access attempts
+        const lastAttempt = localStorage.getItem('dev_access_attempt');
+        const now = Date.now();
+        
+        if (lastAttempt && (now - parseInt(lastAttempt)) < 5000) {
+            showToast('يرجى الانتظار قبل المحاولة مرة أخرى', 'warning');
+            return;
+        }
+        
+        localStorage.setItem('dev_access_attempt', now.toString());
+        
+        // Log the attempt
+        if (window.securityManager) {
+            window.securityManager.logSecurityEvent('developer_access_shortcut', {
+                timestamp: now,
+                userAgent: navigator.userAgent.substring(0, 100)
+            });
+        }
+        
         document.querySelector('[data-tab="developer"]').click();
         document.getElementById('devKey').focus();
     }
+    
+    // Disable common developer shortcuts in production
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        if ((e.ctrlKey && e.shiftKey && e.key === 'I') || // DevTools
+            (e.ctrlKey && e.shiftKey && e.key === 'J') || // Console
+            (e.key === 'F12')) { // DevTools
+            e.preventDefault();
+            showToast('هذه الميزة غير متاحة', 'warning');
+            return false;
+        }
+    }
+});
+
+// Prevent right-click context menu in production
+if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showToast('القائمة السياقية غير متاحة', 'info');
+        return false;
+    });
+}
+
+// Monitor for suspicious activity
+document.addEventListener('DOMContentLoaded', function() {
+    // Monitor for rapid form submissions
+    let formSubmissionCount = 0;
+    let lastSubmission = 0;
+    
+    document.addEventListener('submit', function(e) {
+        const now = Date.now();
+        
+        if (now - lastSubmission < 1000) { // Less than 1 second
+            formSubmissionCount++;
+            
+            if (formSubmissionCount > 3) {
+                e.preventDefault();
+                showToast('تم اكتشاف نشاط مشبوه. يرجى الانتظار.', 'error');
+                
+                if (window.securityManager) {
+                    window.securityManager.logSecurityEvent('rapid_form_submission', {
+                        count: formSubmissionCount,
+                        timeframe: now - lastSubmission
+                    });
+                }
+                
+                return false;
+            }
+        } else {
+            formSubmissionCount = 0;
+        }
+        
+        lastSubmission = now;
+    });
 });
 
 

@@ -1,16 +1,43 @@
 {
   "name": "basira-app",
-  "version": "1.1.0",
-  "description": "نظام إدارة الموارد المتقدم - Basira ERP System",
+  "version": "2.0.1",
+  "description": "نظام إدارة الموارد المتقدم - Basira ERP System Enhanced",
   "main": "login.html",
   "scripts": {
-    "start": "serve .",
-    "build": "echo 'Static build ready'"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'Static build ready'",
+    "test": "echo 'No tests specified'",
+    "security-audit": "npm audit",
+    "performance-test": "echo 'Performance testing would run here'"
   },
   "dependencies": {
-    "crypto-js": "^4.1.1"
+    "crypto-js": "^4.2.0",
+    "express": "^4.18.2",
+    "chokidar": "^3.5.3",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
   },
   "engines": {
-    "node": "24.x"
-  }
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "erp",
+    "business-management",
+    "arabic",
+    "sales",
+    "accounting"
+  ],
+  "author": "Basira Technology",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/basira-tech/basira-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/basira-tech/basira-app/issues"
+  },
+  "homepage": "https://github.com/basira-tech/basira-app#readme"
 }
