@@ -1,16 +1,71 @@
 // Global Variables
 let currentView = 'developer';
 let isDarkMode = true;
-let companies = [
-    { name: 'شركة البصيرة للتجارة', code: 'BSR001', status: 'active' }
-];
+let currentUser = null;
+let companies = [];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
+    loadCurrentUser();
+    loadCompaniesData();
     loadUserData();
     updateStats();
     setInterval(updateStats, 5000); // Update every 5 seconds
 });
+
+// Load current user session
+function loadCurrentUser() {
+    try {
+        const sessionData = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+        if (sessionData) {
+            currentUser = JSON.parse(sessionData);
+            console.log('Current user loaded:', currentUser);
+        } else {
+            console.warn('No user session found');
+            // Redirect to login if no session
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        console.error('Error loading user session:', error);
+        window.location.href = 'login.html';
+    }
+}
+
+// Load companies data with proper key
+function loadCompaniesData() {
+    try {
+        const companyCode = currentUser?.companyCode || 'DEV';
+        const companiesKey = `companies_${companyCode}`;
+        const savedCompanies = localStorage.getItem(companiesKey);
+        
+        if (savedCompanies) {
+            companies = JSON.parse(savedCompanies);
+        } else {
+            // Default companies for developer
+            companies = [
+                { name: 'شركة البصيرة للتجارة', code: 'BSR001', status: 'active' }
+            ];
+            saveCompaniesData();
+        }
+        
+        console.log('Companies loaded:', companies);
+    } catch (error) {
+        console.error('Error loading companies:', error);
+        companies = [{ name: 'شركة البصيرة للتجارة', code: 'BSR001', status: 'active' }];
+    }
+}
+
+// Save companies data with proper key
+function saveCompaniesData() {
+    try {
+        const companyCode = currentUser?.companyCode || 'DEV';
+        const companiesKey = `companies_${companyCode}`;
+        localStorage.setItem(companiesKey, JSON.stringify(companies));
+        console.log('Companies saved to:', companiesKey);
+    } catch (error) {
+        console.error('Error saving companies:', error);
+    }
+}
 
 // Sidebar Functions
 function toggleSidebar() {
@@ -80,11 +135,17 @@ function createCompany() {
     }
     
     // Add company
-    companies.push({
+    const newCompany = {
         name: name,
         code: code,
-        status: 'active'
-    });
+        status: 'active',
+        created: new Date().toISOString()
+    };
+    
+    companies.push(newCompany);
+    
+    // Save companies data
+    saveCompaniesData();
     
     // Create database (simulation)
     createCompanyDatabase(code);
@@ -98,19 +159,44 @@ function createCompany() {
     document.getElementById('companyCode').value = '';
     
     showToast(`تم إنشاء شركة ${name} بنجاح`, 'success');
+    console.log('Company created:', newCompany);
 }
 
 function createCompanyDatabase(companyCode) {
     // Simulate database creation
     console.log(`Creating database for company: ${companyCode}`);
     
-    // In real implementation, this would make an API call to create SQL database
-    const dbName = `company_${companyCode.toLowerCase()}`;
-    localStorage.setItem(`db_${companyCode}`, JSON.stringify({
-        name: dbName,
+    // Create company-specific database keys
+    const dbKey = `db_${companyCode}`;
+    const clientsKey = `clientsDatabase_${companyCode}`;
+    const transactionsKey = `clientTransactions_${companyCode}`;
+    const salesKey = `sales_${companyCode}`;
+    
+    // Initialize database structure
+    const dbStructure = {
+        name: `company_${companyCode.toLowerCase()}`,
         created: new Date().toISOString(),
-        tables: ['users', 'sales', 'inventory', 'reports']
-    }));
+        tables: ['users', 'sales', 'inventory', 'reports', 'clients', 'transactions'],
+        companyCode: companyCode
+    };
+    
+    // Initialize empty data structures
+    const emptyClients = {};
+    const emptyTransactions = {};
+    const emptySales = [];
+    
+    // Save to localStorage
+    localStorage.setItem(dbKey, JSON.stringify(dbStructure));
+    localStorage.setItem(clientsKey, JSON.stringify(emptyClients));
+    localStorage.setItem(transactionsKey, JSON.stringify(emptyTransactions));
+    localStorage.setItem(salesKey, JSON.stringify(emptySales));
+    
+    console.log(`Database created with keys:`, {
+        dbKey,
+        clientsKey,
+        transactionsKey,
+        salesKey
+    });
 }
 
 function updateCompanyList() {
@@ -188,8 +274,9 @@ function handleLogoUpload(event) {
         const logoPreview = document.getElementById('logoPreview');
         logoPreview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
         
-        // Store logo
-        localStorage.setItem('companyLogo', e.target.result);
+        // Store logo with company-specific key
+        const companyCode = currentUser?.companyCode || 'DEV';
+        localStorage.setItem(`companyLogo_${companyCode}`, e.target.result);
         showToast('تم رفع الشعار بنجاح', 'success');
     };
     reader.readAsDataURL(file);
@@ -215,13 +302,18 @@ function updateLogoPosition() {
             break;
     }
     
-    localStorage.setItem('logoPosition', position);
+    // Save with company-specific key
+    const companyCode = currentUser?.companyCode || 'DEV';
+    localStorage.setItem(`logoPosition_${companyCode}`, position);
 }
 
 function updatePrimaryColor() {
     const color = document.getElementById('primaryColor').value;
     document.documentElement.style.setProperty('--primary-color', color);
-    localStorage.setItem('primaryColor', color);
+    
+    // Save with company-specific key
+    const companyCode = currentUser?.companyCode || 'DEV';
+    localStorage.setItem(`primaryColor_${companyCode}`, color);
     showToast('تم تحديث اللون الأساسي', 'success');
 }
 
@@ -229,7 +321,10 @@ function updateFontSize() {
     const size = document.getElementById('fontSize').value;
     document.documentElement.style.setProperty('--font-size', size + 'px');
     document.getElementById('fontSizeValue').textContent = size + 'px';
-    localStorage.setItem('fontSize', size);
+    
+    // Save with company-specific key
+    const companyCode = currentUser?.companyCode || 'DEV';
+    localStorage.setItem(`fontSize_${companyCode}`, size);
 }
 
 // Biometric Functions
@@ -280,33 +375,45 @@ function updateStats() {
 }
 
 function loadUserData() {
-    // Load saved settings
-    const savedColor = localStorage.getItem('primaryColor');
+    if (!currentUser) {
+        console.warn('No current user found');
+        return;
+    }
+    
+    const companyCode = currentUser.companyCode || 'DEV';
+    
+    // Load saved settings with company-specific keys
+    const savedColor = localStorage.getItem(`primaryColor_${companyCode}`);
     if (savedColor) {
         document.getElementById('primaryColor').value = savedColor;
         updatePrimaryColor();
     }
     
-    const savedFontSize = localStorage.getItem('fontSize');
+    const savedFontSize = localStorage.getItem(`fontSize_${companyCode}`);
     if (savedFontSize) {
         document.getElementById('fontSize').value = savedFontSize;
         updateFontSize();
     }
     
-    const savedLogo = localStorage.getItem('companyLogo');
+    const savedLogo = localStorage.getItem(`companyLogo_${companyCode}`);
     if (savedLogo) {
         document.getElementById('logoPreview').innerHTML = `<img src="${savedLogo}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
     }
     
-    const savedPosition = localStorage.getItem('logoPosition');
+    const savedPosition = localStorage.getItem(`logoPosition_${companyCode}`);
     if (savedPosition) {
-        document.querySelector(`input[name="logoPos"][value="${savedPosition}"]`).checked = true;
-        updateLogoPosition();
+        const positionInput = document.querySelector(`input[name="logoPos"][value="${savedPosition}"]`);
+        if (positionInput) {
+            positionInput.checked = true;
+            updateLogoPosition();
+        }
     }
     
     // Update company list
     updateCompanyList();
     updateLicenseDropdown();
+    
+    console.log('User data loaded for company:', companyCode);
 }
 
 // Toast Notification System

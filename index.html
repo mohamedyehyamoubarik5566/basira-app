@@ -7,6 +7,7 @@
     <link href="./bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="./style.css" rel="stylesheet">
+    <link href="./home-styles.css" rel="stylesheet">
     <link href="./logout-style.css" rel="stylesheet">
     <link href="./report-styles.css" rel="stylesheet">
     <link rel="stylesheet" href="./update-styles.css">
@@ -129,9 +130,118 @@
         <div class="content">
             <!-- Dashboard Section -->
             <div id="dashboard-section" class="content-section active">
-                <div class="card">
-                    <div class="card-body">
-                        <h6>مرحباً بك في نظام إدارة المبيعات</h6>
+                <div class="home-container">
+                    <!-- Welcome Section -->
+                    <div class="welcome-section">
+                        <h1 class="welcome-title">مرحباً بك في نظام البصيرة ERP</h1>
+                        <p class="welcome-text">
+                            نظام إدارة موارد المؤسسات المتقدم - الإصدار 2.0<br>
+                            مع تحسينات الأمان والأداء والميزات المتطورة
+                        </p>
+                        
+                        <div class="system-info">
+                            <div class="info-item">
+                                <div class="info-label">إصدار النظام</div>
+                                <div class="info-value" id="systemVersion">2.0.1</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">آخر تحديث</div>
+                                <div class="info-value">ديسمبر 2024</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">المستخدم الحالي</div>
+                                <div class="info-value" id="currentUserDisplay">المدير</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">حالة النظام</div>
+                                <div class="info-value" style="color: #10b981;">نشط</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Overview -->
+                    <div class="stats-overview">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-value" id="dashboardTotalSales">0 ج.م</div>
+                            <div class="stat-label">إجمالي المبيعات اليوم</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-value" id="dashboardTotalClients">0</div>
+                            <div class="stat-label">العملاء النشطين</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="stat-value" id="dashboardTotalOrders">0</div>
+                            <div class="stat-label">الطلبات اليوم</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="stat-value" id="dashboardTotalBalance">0 ج.م</div>
+                            <div class="stat-label">رصيد الخزينة</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <div class="action-card" onclick="navigateToSection('sales')">
+                            <div class="action-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="action-title">إضافة مبيعة</div>
+                            <div class="action-desc">إنشاء إذن مبيعة جديد</div>
+                        </div>
+                        
+                        <div class="action-card" onclick="navigateToSection('clients')">
+                            <div class="action-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="action-title">إضافة عميل</div>
+                            <div class="action-desc">تسجيل عميل جديد</div>
+                        </div>
+                        
+                        <div class="action-card" onclick="navigateToSection('treasury')">
+                            <div class="action-icon">
+                                <i class="fas fa-money-bill"></i>
+                            </div>
+                            <div class="action-title">إدارة الخزينة</div>
+                            <div class="action-desc">متابعة الإيرادات والمصروفات</div>
+                        </div>
+                        
+                        <div class="action-card" onclick="navigateToSection('daily-report')">
+                            <div class="action-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="action-title">التقارير</div>
+                            <div class="action-desc">عرض التقارير اليومية</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <div class="activity-header">
+                            <h2 class="activity-title">النشاط الأخير</h2>
+                            <button class="modern-btn secondary" onclick="refreshActivity()">
+                                <i class="fas fa-sync-alt"></i>
+                                تحديث
+                            </button>
+                        </div>
+                        
+                        <div class="activity-list" id="recentActivityList">
+                            <!-- سيتم ملء النشاط الأخير هنا -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1785,6 +1895,7 @@
                 if (section === 'vehicles') loadVehicles();
                 if (section === 'daily-report') loadDailyReport();
                 if (section === 'bank') loadBankManagement();
+                if (section === 'dashboard') loadDashboard();
                 if (section === 'clients') {
                     // تحديث فوري عند فتح صفحة العملاء
                     setTimeout(() => {
@@ -1806,10 +1917,277 @@
             // Real-time subscriptions disabled in localStorage mode
         }
         
+        // Dashboard Functions
+        function loadDashboard() {
+            updateDashboardStats();
+            loadRecentActivity();
+            updateSystemInfo();
+        }
+        
+        function updateDashboardStats() {
+            try {
+                // إحصائيات المبيعات اليوم
+                const {start, end} = getCurrentDayRange();
+                const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+                const todayPermissions = permissions.filter(p => {
+                    const date = new Date(p.date);
+                    return date >= start && date < end;
+                });
+                
+                const totalSales = todayPermissions.reduce((sum, p) => sum + parseFloat(p.totalPrice || 0), 0);
+                const totalOrders = todayPermissions.length;
+                
+                // إحصائيات العملاء
+                const clients = getClientsDatabase();
+                const totalClients = Object.keys(clients).length;
+                
+                // رصيد الخزينة
+                const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                const totalBalance = transactions.reduce((balance, t) => {
+                    return t.type === 'income' ? balance + t.amount : balance - t.amount;
+                }, 0);
+                
+                // تحديث العرض
+                document.getElementById('dashboardTotalSales').textContent = `${totalSales.toFixed(2)} ج.م`;
+                document.getElementById('dashboardTotalClients').textContent = totalClients;
+                document.getElementById('dashboardTotalOrders').textContent = totalOrders;
+                document.getElementById('dashboardTotalBalance').textContent = `${totalBalance.toFixed(2)} ج.م`;
+                
+            } catch (error) {
+                console.error('Error updating dashboard stats:', error);
+            }
+        }
+        
+        function loadRecentActivity() {
+            try {
+                const activityList = document.getElementById('recentActivityList');
+                const activities = [];
+                
+                // إضافة المبيعات الأخيرة
+                const permissions = JSON.parse(localStorage.getItem('permissions') || '[]')
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 5);
+                
+                permissions.forEach(p => {
+                    activities.push({
+                        type: 'sale',
+                        text: `مبيعة جديدة للعميل ${p.clientName} بقيمة ${parseFloat(p.totalPrice).toFixed(2)} ج.م`,
+                        time: new Date(p.date),
+                        icon: 'fas fa-shopping-cart'
+                    });
+                });
+                
+                // إضافة العملاء الجدد
+                const clients = getClientsDatabase();
+                Object.values(clients)
+                    .filter(c => c.createdAt)
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .slice(0, 3)
+                    .forEach(c => {
+                        activities.push({
+                            type: 'client',
+                            text: `تم إضافة عميل جديد: ${c.name}`,
+                            time: new Date(c.createdAt),
+                            icon: 'fas fa-user-plus'
+                        });
+                    });
+                
+                // إضافة المعاملات المالية الأخيرة
+                const transactions = JSON.parse(localStorage.getItem('transactions') || '[]')
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 3);
+                
+                transactions.forEach(t => {
+                    activities.push({
+                        type: 'payment',
+                        text: `${t.type === 'income' ? 'إيراد' : 'مصروف'}: ${t.description} - ${t.amount.toFixed(2)} ج.م`,
+                        time: new Date(t.date),
+                        icon: t.type === 'income' ? 'fas fa-arrow-down' : 'fas fa-arrow-up'
+                    });
+                });
+                
+                // ترتيب النشاطات حسب الوقت
+                activities.sort((a, b) => b.time - a.time);
+                
+                if (activities.length === 0) {
+                    activityList.innerHTML = '<div class="no-activity">لا توجد أنشطة حديثة</div>';
+                    return;
+                }
+                
+                activityList.innerHTML = activities.slice(0, 8).map(activity => {
+                    const timeAgo = getTimeAgo(activity.time);
+                    return `
+                        <div class="activity-item">
+                            <div class="activity-icon ${activity.type}">
+                                <i class="${activity.icon}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">${activity.text}</div>
+                                <div class="activity-time">${timeAgo}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                document.getElementById('recentActivityList').innerHTML = '<div class="no-activity">خطأ في تحميل النشاط الأخير</div>';
+            }
+        }
+        
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'الآن';
+            if (minutes < 60) return `منذ ${minutes} دقيقة`;
+            if (hours < 24) return `منذ ${hours} ساعة`;
+            return `منذ ${days} يوم`;
+        }
+        
+        function updateSystemInfo() {
+            try {
+                const session = sessionStorage.getItem('currentUser');
+                if (session) {
+                    const user = JSON.parse(session);
+                    document.getElementById('currentUserDisplay').textContent = user.companyName || user.username || 'المستخدم';
+                }
+                
+                if (typeof SystemConfig !== 'undefined' && SystemConfig.version) {
+                    document.getElementById('systemVersion').textContent = SystemConfig.version.current || '2.0.1';
+                }
+            } catch (error) {
+                console.error('Error updating system info:', error);
+            }
+        }
+        
+        function navigateToSection(sectionName) {
+            // إزالة الفئة النشطة من جميع العناصر
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            
+            // إضافة الفئة النشطة للقسم المطلوب
+            const navItem = document.querySelector(`[data-section="${sectionName}"]`);
+            const section = document.getElementById(`${sectionName}-section`);
+            
+            if (navItem && section) {
+                navItem.classList.add('active');
+                section.classList.add('active');
+                document.getElementById('pageTitle').textContent = navItem.textContent.trim();
+                
+                // تحميل بيانات القسم
+                switch(sectionName) {
+                    case 'sales':
+                        loadSales();
+                        break;
+                    case 'clients':
+                        setTimeout(() => loadClients(), 50);
+                        break;
+                    case 'treasury':
+                        loadTreasury();
+                        break;
+                    case 'daily-report':
+                        loadDailyReport();
+                        break;
+                }
+            }
+        }
+        
+        function refreshActivity() {
+            loadRecentActivity();
+            updateDashboardStats();
+            showNotification('تم تحديث النشاط الأخير!');
+        }
+        
+        // تحديث تلقائي للصفحة الرئيسية كل 30 ثانية
+        let dashboardUpdateInterval;
+        
+        function startDashboardAutoUpdate() {
+            dashboardUpdateInterval = setInterval(() => {
+                if (document.getElementById('dashboard-section').classList.contains('active')) {
+                    updateDashboardStats();
+                    loadRecentActivity();
+                }
+            }, 30000); // كل 30 ثانية
+        }
+        
+        function stopDashboardAutoUpdate() {
+            if (dashboardUpdateInterval) {
+                clearInterval(dashboardUpdateInterval);
+            }
+        }
+        
+        // بدء التحديث التلقائي عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            startDashboardAutoUpdate();
+        });
+        
+        // إيقاف التحديث عند مغادرة الصفحة
+        window.addEventListener('beforeunload', function() {
+            stopDashboardAutoUpdate();
+        });
+        
+        // تحسين الأمان - التحقق من صحة البيانات
+        function validateDashboardData() {
+            try {
+                // التحقق من وجود البيانات الأساسية
+                const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+                const clients = getClientsDatabase();
+                const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                
+                // التحقق من صحة تنسيق البيانات
+                if (!Array.isArray(permissions) || !Array.isArray(transactions)) {
+                    throw new Error('Invalid data format');
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Dashboard data validation failed:', error);
+                showNotification('خطأ في التحقق من صحة البيانات', 'error');
+                return false;
+            }
+        }
+        
+        // تحسين الأداء - تخزين مؤقت للبيانات
+        let dashboardCache = {
+            stats: null,
+            activity: null,
+            lastUpdate: null
+        };
+        
+        function getCachedDashboardData() {
+            const now = Date.now();
+            const cacheExpiry = 5 * 60 * 1000; // 5 دقائق
+            
+            if (dashboardCache.lastUpdate && (now - dashboardCache.lastUpdate) < cacheExpiry) {
+                return dashboardCache;
+            }
+            
+            return null;
+        }
+        
+        function setCachedDashboardData(stats, activity) {
+            dashboardCache = {
+                stats: stats,
+                activity: activity,
+                lastUpdate: Date.now()
+            };
+        }
+        
         // تم إزالة البيانات الافتراضية - البرنامج يبدأ فارغاً
         if (window.dbManager) {
             initializeRealTime();
         }
+        
+        // تحميل الصفحة الرئيسية عند بدء التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                loadDashboard();
+            }, 500);
+        });
         
         // Event delegation for client actions
         document.addEventListener('click', function(e) {

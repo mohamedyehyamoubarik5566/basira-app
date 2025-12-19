@@ -612,15 +612,67 @@ let statementData = [];
 
 // Helper functions for client statement
 function getClientsDatabase() {
-    const session = sessionStorage.getItem('currentUser');
-    const user = session ? JSON.parse(session) : null;
-    const companyCode = user?.companyCode || 'default';
-    return JSON.parse(localStorage.getItem(`clientsDatabase_${companyCode}`) || '{}');
+    // Get current user session
+    let user = null;
+    try {
+        const sessionData = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+        user = sessionData ? JSON.parse(sessionData) : null;
+    } catch (error) {
+        console.warn('Error parsing user session:', error);
+    }
+    
+    // Get company code with fallback
+    let companyCode = 'default';
+    if (user?.companyCode) {
+        companyCode = user.companyCode;
+    } else if (user?.role === 'admin' || user?.username === 'developer') {
+        companyCode = 'DEV';
+    }
+    
+    // Load clients database for the company
+    const dbKey = `clientsDatabase_${companyCode}`;
+    let clientsDb = {};
+    
+    try {
+        clientsDb = JSON.parse(localStorage.getItem(dbKey) || '{}');
+    } catch (error) {
+        console.warn('Error loading clients database:', error);
+        clientsDb = {};
+    }
+    
+    return clientsDb;
 }
 
 function getClientTransactions(clientName) {
-    const clientTransactions = JSON.parse(localStorage.getItem('clientTransactions') || '{}');
-    return clientTransactions[clientName] || [];
+    // Get current user session
+    let user = null;
+    try {
+        const sessionData = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+        user = sessionData ? JSON.parse(sessionData) : null;
+    } catch (error) {
+        console.warn('Error parsing user session:', error);
+    }
+    
+    // Get company code with fallback
+    let companyCode = 'default';
+    if (user?.companyCode) {
+        companyCode = user.companyCode;
+    } else if (user?.role === 'admin' || user?.username === 'developer') {
+        companyCode = 'DEV';
+    }
+    
+    // Load client transactions
+    const transactionsKey = `clientTransactions_${companyCode}`;
+    let allTransactions = {};
+    
+    try {
+        allTransactions = JSON.parse(localStorage.getItem(transactionsKey) || '{}');
+    } catch (error) {
+        console.warn('Error loading client transactions:', error);
+        allTransactions = {};
+    }
+    
+    return allTransactions[clientName] || [];
 }
 
 function showNotification(message, type = 'success') {
