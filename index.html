@@ -1688,7 +1688,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const versionElement = document.getElementById('appVersion');
             if (versionElement) {
-                versionElement.textContent = SystemConfig?.version?.current || '2.0.1';
+                // Wait for SystemConfig to be available
+                if (typeof SystemConfig !== 'undefined' && SystemConfig.version) {
+                    versionElement.textContent = SystemConfig.version.current || '2.0.1';
+                } else {
+                    versionElement.textContent = '2.0.1';
+                }
             }
         });
         
