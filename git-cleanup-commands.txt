@@ -1,0 +1,11 @@
+# Commands to remove node_modules from Git tracking (run these in order):
+
+# 1. Remove node_modules from Git index (keeps local files)
+git rm -r --cached node_modules
+
+# 2. Add and commit the .gitignore changes
+git add .gitignore
+git commit -m "Remove node_modules from tracking and update .gitignore"
+
+# 3. Push the changes
+git push origin main

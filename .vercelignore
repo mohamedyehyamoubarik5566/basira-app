@@ -1,12 +1,8 @@
 node_modules
 .git
 *.log
-.env
 .env.local
-server.js
-start.bat
-package-lock.json
-test-report.md
-api-endpoints.md
-erp-database-init.sql
-supabase-tables.sql
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
