@@ -1,8 +1,12 @@
-node_modules
-.git
+node_modules/
+.git/
 *.log
 .env.local
 .DS_Store
 Thumbs.db
 *.bak
 *.tmp
+package-lock.json
+.vercel/
+deploy-commands.bat
+git-cleanup-commands.txt
