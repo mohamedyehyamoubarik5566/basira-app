@@ -1,0 +1,27 @@
+{
+  "name": "basira-erp-system",
+  "version": "2.0.0",
+  "description": "نظام إدارة الموارد المتقدم - Basira ERP System",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static build ready'",
+    "start": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "erp",
+    "management",
+    "arabic",
+    "business",
+    "sales"
+  ],
+  "author": "Basira Tech",
+  "license": "MIT",
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

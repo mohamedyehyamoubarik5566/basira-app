@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام البصيرة ERP 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #0a0f1c;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Data Streaming Background */
+        .data-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0f1c 0%, #1a2332 50%, #0a0f1c 100%);
+            z-index: 1;
+        }
+
+        .data-stream::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, transparent 0%, rgba(0, 255, 136, 0.1) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(0, 255, 136, 0.05) 50%, transparent 100%);
+            background-size: 100px 100px, 50px 50px;
+            animation: dataFlow 8s linear infinite;
+        }
+
+        @keyframes dataFlow {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 50px); }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff88;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; }
+        .particle:nth-child(3) { top: 80%; left: 30%; animation-delay: 2s; }
+        .particle:nth-child(4) { top: 40%; left: 70%; animation-delay: 3s; }
+        .particle:nth-child(5) { top: 10%; left: 90%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+        }
+
+        /* Main Container */
+        .splash-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Glassmorphism Card */
+        .loading-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            min-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Logo */
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #0a0f1c;
+            font-weight: 700;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(0, 255, 136, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(0, 255, 136, 0.8); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Brand Text */
+        .brand-text {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Status Text */
+        .status-text {
+            color: #00ff88;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            min-height: 24px;
+        }
+
+        /* Footer */
+        .footer-text {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        /* Fade Out Animation */
+        .fade-out {
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.95); }
+        }
+
+        /* Check Icons */
+        .check-icon {
+            display: inline-block;
+            margin-left: 0.5rem;
+            color: #00ff88;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .check-icon.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+    <div class="data-stream"></div>
+    
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="splash-container">
+        <div class="loading-card">
+            <div class="logo">ب</div>
+            
+            <div class="brand-text">نظام البصيرة ERP</div>
+            <div class="brand-subtitle">Basira ERP System 2026</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="progress-text" id="progressText">0%</div>
+            <div class="status-text" id="statusText">فحص سلامة النظام...</div>
+        </div>
+        
+        <div class="footer-text">
+            Powered by Basira Tech<br>
+            مدعوم من تقنيات البصيرة
+        </div>
+    </div>
+
+    <script>
+        class SplashScreen {
+            constructor() {
+                this.progress = 0;
+                this.checks = [
+                    { name: 'فحص الاتصال بالإنترنت', nameEn: 'Internet Connectivity', fn: this.checkInternet },
+                    { name: 'الاتصال بقاعدة البيانات', nameEn: 'Database Connection', fn: this.checkDatabase },
+                    { name: 'فحص التحديثات', nameEn: 'Version Check', fn: this.checkVersion },
+                    { name: 'فحص جلسة المستخدم', nameEn: 'Session Check', fn: this.checkSession }
+                ];
+                this.currentCheck = 0;
+                this.hasSession = false;
+            }
+
+            async start() {
+                await this.delay(1000);
+                
+                for (let i = 0; i < this.checks.length; i++) {
+                    this.currentCheck = i;
+                    await this.runCheck(this.checks[i]);
+                    await this.delay(800);
+                }
+                
+                await this.complete();
+            }
+
+            async runCheck(check) {
+                this.updateStatus(check.name);
+                
+                try {
+                    const result = await check.fn.call(this);
+                    this.updateProgress((this.currentCheck + 1) * 25);
+                    this.showCheckIcon();
+                    return result;
+                } catch (error) {
+                    console.error(`Check failed: ${check.name}`, error);
+                    this.updateProgress((this.currentCheck + 1) * 25);
+                    this.showCheckIcon();
+                }
+            }
+
+            async checkInternet() {
+                return new Promise((resolve) => {
+                    if (navigator.onLine) {
+                        fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' })
+                            .then(() => resolve(true))
+                            .catch(() => resolve(false));
+                    } else {
+                        resolve(false);
+                    }
+                    setTimeout(() => resolve(true), 1500);
+                });
+            }
+
+            async checkDatabase() {
+                return new Promise((resolve) => {
+                    // Simulate Supabase connection check
+                    setTimeout(() => resolve(true), 1200);
+                });
+            }
+
+            async checkVersion() {
+                return new Promise((resolve) => {
+                    // Simulate version check
+                    setTimeout(() => resolve(true), 1000);
+                });
+            }
+
+            async checkSession() {
+                return new Promise((resolve) => {
+                    try {
+                        const session = localStorage.getItem('basira_session');
+                        if (session) {
+                            const sessionData = JSON.parse(session);
+                            const now = Date.now();
+                            if (sessionData.timestamp && (now - sessionData.timestamp) < 30 * 60 * 1000) {
+                                this.hasSession = true;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Session check error:', error);
+                    }
+                    setTimeout(() => resolve(true), 800);
+                });
+            }
+
+            updateProgress(percent) {
+                this.progress = percent;
+                document.getElementById('progressBar').style.width = percent + '%';
+                document.getElementById('progressText').textContent = percent + '%';
+            }
+
+            updateStatus(text) {
+                document.getElementById('statusText').innerHTML = text + ' <span class="check-icon">✓</span>';
+            }
+
+            showCheckIcon() {
+                const icon = document.querySelector('#statusText .check-icon');
+                if (icon) {
+                    icon.classList.add('show');
+                }
+            }
+
+            async complete() {
+                this.updateStatus('اكتمل التحميل بنجاح');
+                await this.delay(1000);
+                
+                document.querySelector('.splash-container').classList.add('fade-out');
+                
+                setTimeout(() => {
+                    if (this.hasSession) {
+                        window.location.href = 'index.html';
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+                }, 1000);
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Start splash screen
+        document.addEventListener('DOMContentLoaded', () => {
+            const splash = new SplashScreen();
+            splash.start();
+        });
+    </script>
+</body>
+</html>

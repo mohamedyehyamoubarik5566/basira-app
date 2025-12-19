@@ -1,0 +1,21 @@
+{
+  "version": "2.0.1",
+  "update_date": "2025-12-19",
+  "mandatory": true,
+  "new_features": [
+    "New Sales Report",
+    "Bug fixes",
+    "Enhanced Security"
+  ],
+  "files_to_update": [
+    "script.js",
+    "style.css",
+    "login-script.js"
+  ],
+  "signature": "basira_verified_2025",
+  "update_url": "https://your-server.com/basira-updates/",
+  "branding": {
+    "logo_url": "https://your-server.com/basira-logo.png",
+    "company_name": "Basira ERP"
+  }
+}

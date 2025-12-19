@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الدخول 2026 - نظام إدارة الموارد</title>
+    <link rel="stylesheet" href="login-style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Security Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="utils.js"></script>
+    <script src="security.js"></script>
+</head>
+<body>
+    <div class="particles-bg"></div>
+    <div class="data-stream"></div>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="scan-laser"></div>
+            
+            <div class="header">
+                <h1 class="title" data-ar="بوابة الدخول 2026" data-en="Login Portal 2026">بوابة الدخول 2026</h1>
+                <p class="subtitle" data-ar="نظام إدارة الموارد المتقدم" data-en="Advanced ERP System">نظام إدارة الموارد المتقدم</p>
+                <div class="lang-switch">
+                    <button class="lang-btn active" data-lang="ar">عربي</button>
+                    <button class="lang-btn" data-lang="en">English</button>
+                </div>
+            </div>
+
+            <div class="biometric-section">
+                <div class="fingerprint-container">
+                    <div class="fingerprint-icon" id="fingerprintBtn">
+                        <i class="fas fa-fingerprint"></i>
+                        <div class="pulse-ring"></div>
+                        <div class="scan-animation"></div>
+                    </div>
+                    <p class="biometric-text" data-ar="المصادقة البيومترية" data-en="Biometric Authentication">المصادقة البيومترية</p>
+                </div>
+            </div>
+
+            <div class="divider">
+                <span data-ar="أو" data-en="OR">أو</span>
+            </div>
+
+            <div class="access-tabs">
+                <button class="tab-btn active" data-tab="corporate" data-ar="دخول الشركات" data-en="Corporate Access">دخول الشركات</button>
+                <button class="tab-btn" data-tab="developer" data-ar="دخول المطور" data-en="Developer Access">دخول المطور</button>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <div class="tab-content active" id="corporate-tab">
+                    <div class="input-group">
+                        <i class="fas fa-building"></i>
+                        <input type="text" id="companyCode" placeholder="كود دخول الشركة" data-ar="كود دخول الشركة" data-en="Company Access Code" required>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="developer-tab">
+                    <div class="input-group">
+                        <i class="fas fa-code"></i>
+                        <input type="password" id="devKey" placeholder="مفتاح المطور" data-ar="مفتاح المطور" data-en="Developer Key" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" data-ar="دخول" data-en="Login">
+                    <span>دخول</span>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink" data-ar="نسيت كلمة السر؟" data-en="Forgot Password?">نسيت كلمة السر؟</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Overlay -->
+    <div class="forgot-overlay" id="forgotOverlay">
+        <div class="forgot-card">
+            <div class="forgot-header">
+                <h3 id="forgotTitle" data-ar="استعادة كلمة المرور" data-en="Password Recovery">استعادة كلمة المرور</h3>
+                <button class="close-btn" id="closeForgot">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Step 1: Mobile Verification -->
+            <div class="forgot-step active" id="step1">
+                <p class="step-desc" data-ar="أدخل بيانات الشركة ورقم الهاتف المسجل" data-en="Enter company details and registered mobile">أدخل بيانات الشركة ورقم الهاتف المسجل</p>
+                <div class="input-group">
+                    <i class="fas fa-building"></i>
+                    <input type="text" id="forgotCompanyCode" placeholder="كود الشركة" data-ar="كود الشركة" data-en="Company Code" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-mobile-alt"></i>
+                    <input type="tel" id="mobileNumber" placeholder="رقم الهاتف المسجل" data-ar="رقم الهاتف المسجل" data-en="Registered Mobile" required>
+                </div>
+                <button class="forgot-btn" id="sendOtpBtn" data-ar="إرسال رمز التحقق" data-en="Send Verification Code">
+                    <span>إرسال رمز التحقق</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            
+            <!-- Step 2: OTP Input -->
+            <div class="forgot-step" id="step2">
+                <p class="step-desc" data-ar="أدخل رمز التحقق المرسل إلى هاتفك" data-en="Enter the verification code sent to your phone">أدخل رمز التحقق المرسل إلى هاتفك</p>
+                <div class="otp-container">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0">
+                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                </div>
+                <div class="timer-section">
+                    <span class="timer" id="otpTimer">05:00</span>
+                    <button class="resend-btn" id="resendBtn" disabled data-ar="إعادة الإرسال" data-en="Resend Code">إعادة الإرسال</button>
+                </div>
+                <button class="forgot-btn" id="verifyOtpBtn" data-ar="تحقق من الرمز" data-en="Verify Code">
+                    <span>تحقق من الرمز</span>
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+            
+            <!-- Step 3: Reset Password -->
+            <div class="forgot-step" id="step3">
+                <p class="step-desc" data-ar="أدخل كلمة المرور الجديدة" data-en="Enter your new password">أدخل كلمة المرور الجديدة</p>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة" data-ar="كلمة المرور الجديدة" data-en="New Password" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور" data-ar="تأكيد كلمة المرور" data-en="Confirm Password" required>
+                </div>
+                <button class="forgot-btn" id="resetPasswordBtn" data-ar="تحديث كلمة المرور" data-en="Update Password">
+                    <span>تحديث كلمة المرور</span>
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="login-script.js"></script>
+</body>
+</html>

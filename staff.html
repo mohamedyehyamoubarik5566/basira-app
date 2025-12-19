@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الموظفين والرواتب 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="control-panel-style.css">
+    <link rel="stylesheet" href="staff-style.css">
+</head>
+<body class="dark-mode">
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="neon-grid"></div>
+        <div class="floating-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-users"></i>
+                <span class="logo-text">إدارة الموظفين</span>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="user-profile">
+            <div class="avatar">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="user-info">
+                <span class="user-name">مدير الموارد البشرية</span>
+                <span class="user-role">HR Manager</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" onclick="switchView('attendance')">
+                <i class="fas fa-calendar-check"></i>
+                <span>تتبع الحضور</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchView('advances')">
+                <i class="fas fa-hand-holding-dollar"></i>
+                <span>السلف</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchView('payroll')">
+                <i class="fas fa-calculator"></i>
+                <span>حساب الرواتب</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchView('settlement')">
+                <i class="fas fa-receipt"></i>
+                <span>التصفية</span>
+            </a>
+            <a href="control-panel.html" class="nav-item">
+                <i class="fas fa-arrow-right"></i>
+                <span>لوحة التحكم</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+                <span>الوضع المظلم</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 id="pageTitle">تتبع الحضور</h1>
+                <p id="pageSubtitle">إدارة الموظفين والرواتب - نظام 2026</p>
+            </div>
+            <div class="header-right">
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span id="totalStaff">8</span>
+                        <small>إجمالي الموظفين</small>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-user-check"></i>
+                        <span id="presentToday">6</span>
+                        <small>حاضر اليوم</small>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-wallet"></i>
+                        <span id="safeBalance">15,750</span>
+                        <small>رصيد الخزينة</small>
+                    </div>
+                </div>
+                <div class="shift-info">
+                    <div class="shift-timer">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTime"></span>
+                    </div>
+                    <div class="next-reset">
+                        <small>إعادة التعيين: 08:00 ص</small>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Attendance View -->
+        <div id="attendance-view" class="view-content active">
+            <div class="attendance-grid">
+                <div class="glass-card full-width">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>سجل الحضور - <span id="currentDate"></span></h3>
+                        <div class="attendance-controls">
+                            <button class="neon-btn secondary" onclick="markAllPresent()">
+                                <i class="fas fa-check-double"></i>
+                                تحديد الكل حاضر
+                            </button>
+                            <button class="neon-btn primary" onclick="saveAttendance()">
+                                <i class="fas fa-save"></i>
+                                حفظ الحضور
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="attendance-table">
+                            <div class="table-header">
+                                <div class="col-name">اسم الموظف</div>
+                                <div class="col-position">المنصب</div>
+                                <div class="col-rate">الراتب اليومي</div>
+                                <div class="col-status">الحالة</div>
+                                <div class="col-actions">الإجراءات</div>
+                            </div>
+                            <div class="table-body" id="attendanceTableBody">
+                                <!-- Staff rows will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advances View -->
+        <div id="advances-view" class="view-content">
+            <div class="dashboard-grid">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <i class="fas fa-plus-circle"></i>
+                        <h3>إضافة سلفة جديدة</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <select id="advanceStaff">
+                                <option>اختر الموظف</option>
+                            </select>
+                            <input type="number" id="advanceAmount" placeholder="مبلغ السلفة" min="0">
+                            <textarea id="advanceNote" placeholder="ملاحظات (اختياري)" rows="3"></textarea>
+                        </div>
+                        <button class="neon-btn primary" onclick="addAdvance()">
+                            <i class="fas fa-hand-holding-dollar"></i>
+                            إضافة السلفة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-card wide">
+                    <div class="card-header">
+                        <i class="fas fa-history"></i>
+                        <h3>سجل السلف</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="advances-list" id="advancesList">
+                            <!-- Advances will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payroll View -->
+        <div id="payroll-view" class="view-content">
+            <div class="payroll-grid" id="payrollGrid">
+                <!-- Payroll cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Settlement View -->
+        <div id="settlement-view" class="view-content">
+            <div class="dashboard-grid">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <i class="fas fa-calculator"></i>
+                        <h3>تصفية الراتب</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <select id="settlementStaff" onchange="calculateSettlement()">
+                                <option>اختر الموظف</option>
+                            </select>
+                            <div class="settlement-summary" id="settlementSummary">
+                                <div class="summary-row">
+                                    <span>إجمالي الأيام:</span>
+                                    <span id="totalDays">0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>الراتب اليومي:</span>
+                                    <span id="dailyRate">0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>إجمالي الراتب:</span>
+                                    <span id="totalSalary">0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>إجمالي السلف:</span>
+                                    <span id="totalAdvances">0</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>صافي الراتب:</span>
+                                    <span id="netSalary">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="neon-btn primary" onclick="processSettlement()" id="settlementBtn" disabled>
+                            <i class="fas fa-receipt"></i>
+                            إجراء التصفية
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-card wide">
+                    <div class="card-header">
+                        <i class="fas fa-file-invoice"></i>
+                        <h3>إيصال التصفية</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="receipt-preview" id="receiptPreview">
+                            <p>اختر موظف لعرض إيصال التصفية</p>
+                        </div>
+                        <button class="neon-btn secondary" onclick="printReceipt()" id="printBtn" style="display: none;">
+                            <i class="fas fa-print"></i>
+                            طباعة الإيصال
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settlement Receipt Modal -->
+    <div class="modal" id="receiptModal">
+        <div class="modal-content receipt-modal">
+            <div class="receipt-header">
+                <h2>إيصال تصفية راتب</h2>
+                <button class="close-btn" onclick="closeReceiptModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="receipt-body" id="receiptBody">
+                <!-- Receipt content will be populated -->
+            </div>
+            <div class="receipt-footer">
+                <button class="neon-btn primary" onclick="printReceipt()">
+                    <i class="fas fa-print"></i>
+                    طباعة
+                </button>
+                <button class="neon-btn secondary" onclick="closeReceiptModal()">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="control-panel-script.js"></script>
+    <script src="staff-script.js"></script>
+</body>
+</html>

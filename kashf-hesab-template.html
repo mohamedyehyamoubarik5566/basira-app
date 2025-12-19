@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كشف حساب عميل - Statement of Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-20px) translateY(-20px); }
+        }
+
+        /* Main Container */
+        .statement-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        /* Company Watermark */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(255, 255, 255, 0.02);
+            font-weight: 800;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Header Section */
+        .statement-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid rgba(138, 43, 226, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-placeholder {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #8a2be2, #da70d6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+        }
+
+        .report-title {
+            text-align: center;
+        }
+
+        .report-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #8a2be2, #da70d6, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+        }
+
+        .report-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+
+        .company-info {
+            text-align: right;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .company-info h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #da70d6;
+            margin-bottom: 10px;
+        }
+
+        .company-info p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+
+        /* Client Profile Card */
+        .client-profile {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(218, 112, 214, 0.1));
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .client-profile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8a2be2, #da70d6, transparent);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .profile-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #8a2be2, #da70d6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+        }
+
+        .profile-content h4 {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .profile-content p {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Transaction Table */
+        .transaction-table {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(218, 112, 214, 0.2));
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 120px 100px 2fr 120px 120px 120px;
+            gap: 15px;
+            padding: 0 25px;
+            align-items: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .table-header .table-row {
+            color: #da70d6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .table-body .table-row {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .table-body .table-row:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .table-body .table-row:hover {
+            background: rgba(138, 43, 226, 0.1);
+            transform: translateX(5px);
+        }
+
+        .status-tag {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-paid {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .amount-debit {
+            color: #ff6b6b;
+            font-weight: 700;
+        }
+
+        .amount-credit {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .balance-positive {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .balance-negative {
+            color: #ff6b6b;
+            font-weight: 700;
+        }
+
+        /* Financial Summary */
+        .financial-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .summary-card.debts::before {
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+        }
+
+        .summary-card.payments::before {
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+        }
+
+        .summary-card.balance::before {
+            background: linear-gradient(90deg, #8a2be2, #da70d6);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .summary-amount {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .statement-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        .qr-code {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8a2be2, #da70d6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0;
+            }
+            
+            .statement-container {
+                background: white !important;
+                backdrop-filter: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 20px;
+            }
+            
+            .watermark {
+                color: rgba(0, 0, 0, 0.05) !important;
+            }
+            
+            .report-title h1 {
+                color: #8a2be2 !important;
+                -webkit-text-fill-color: #8a2be2 !important;
+            }
+            
+            .client-profile,
+            .transaction-table,
+            .summary-card {
+                background: rgba(138, 43, 226, 0.05) !important;
+                backdrop-filter: none !important;
+                border: 1px solid rgba(138, 43, 226, 0.2) !important;
+            }
+            
+            .table-body .table-row:hover {
+                transform: none !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .statement-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .client-profile {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .financial-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">البصيرة</div>
+    
+    <div class="statement-container">
+        <!-- Header Section -->
+        <div class="statement-header">
+            <div class="company-logo">
+                <div class="logo-placeholder" id="companyLogo">
+                    B
+                </div>
+            </div>
+            
+            <div class="report-title">
+                <h1>كشف حساب عميل</h1>
+                <p class="report-subtitle">Statement of Account</p>
+            </div>
+            
+            <div class="company-info">
+                <h3 id="companyName">شركة البصيرة للمقاولات</h3>
+                <p><i class="fas fa-map-marker-alt"></i> العنوان: القاهرة، مصر</p>
+                <p><i class="fas fa-phone"></i> هاتف: 01234567890</p>
+                <p><i class="fas fa-id-card"></i> الرقم الضريبي: 123456789</p>
+                <p><i class="fas fa-calendar"></i> تاريخ الإصدار: <span id="reportDate"></span></p>
+            </div>
+        </div>
+
+        <!-- Client Profile Card -->
+        <div class="client-profile">
+            <div class="profile-item">
+                <div class="profile-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-content">
+                    <h4>اسم العميل</h4>
+                    <p id="clientName">اسم العميل</p>
+                </div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="profile-content">
+                    <h4>رقم الهاتف</h4>
+                    <p id="clientPhone">01234567890</p>
+                </div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="profile-content">
+                    <h4>حد الائتمان</h4>
+                    <p id="creditLimit">50,000 ج.م</p>
+                </div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="profile-content">
+                    <h4>فترة الكشف</h4>
+                    <p id="dateRange">من 01/01/2024 إلى 31/12/2024</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction Table -->
+        <div class="transaction-table">
+            <div class="table-header">
+                <div class="table-row">
+                    <div>التاريخ والوقت</div>
+                    <div>رقم المرجع</div>
+                    <div>الوصف</div>
+                    <div>مدين (دين)</div>
+                    <div>دائن (دفع)</div>
+                    <div>الرصيد الجاري</div>
+                </div>
+            </div>
+            
+            <div class="table-body" id="transactionTableBody">
+                <!-- Transactions will be populated here -->
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="financial-summary">
+            <div class="summary-card debts">
+                <div class="summary-icon">
+                    <i class="fas fa-arrow-up" style="color: #ff6b6b;"></i>
+                </div>
+                <div class="summary-amount amount-debit" id="totalDebts">0.00 ج.م</div>
+                <div class="summary-label">إجمالي الديون</div>
+            </div>
+            
+            <div class="summary-card payments">
+                <div class="summary-icon">
+                    <i class="fas fa-arrow-down" style="color: #22c55e;"></i>
+                </div>
+                <div class="summary-amount amount-credit" id="totalPayments">0.00 ج.م</div>
+                <div class="summary-label">إجمالي المدفوعات</div>
+            </div>
+            
+            <div class="summary-card balance">
+                <div class="summary-icon">
+                    <i class="fas fa-balance-scale" style="color: #8a2be2;"></i>
+                </div>
+                <div class="summary-amount" id="netBalance">0.00 ج.م</div>
+                <div class="summary-label">صافي الرصيد</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="statement-footer">
+            <div>
+                <p>طُبع في: <span id="printTimestamp"></span></p>
+                <p>نظام إدارة الموارد - شركة البصيرة</p>
+            </div>
+            
+            <div>
+                <p>صفحة 1 من 1</p>
+                <p>تم التحقق من النظام</p>
+            </div>
+            
+            <div class="qr-code">
+                <div>
+                    QR<br>
+                    Code
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="report-generator.js"></script>
+</body>
+</html>
