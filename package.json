@@ -1,16 +1,16 @@
 {
-  "name": "basira-erp-system",
-  "version": "2.0.0",
+  "name": "basira-app",
+  "version": "1.1.0",
   "description": "نظام إدارة الموارد المتقدم - Basira ERP System",
   "main": "login.html",
   "scripts": {
-    "build": "echo 'Static build ready'",
-    "start": "echo 'Static site - no server needed'"
+    "start": "serve .",
+    "build": "echo 'Static build ready'"
   },
   "dependencies": {
     "crypto-js": "^4.1.1"
   },
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   }
 }
