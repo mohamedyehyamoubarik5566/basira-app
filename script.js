@@ -1,8 +1,24 @@
 // Basira App - Main JavaScript
 
+// Wait for SystemConfig to load
+if (typeof SystemConfig === 'undefined') {
+    console.warn('SystemConfig not loaded yet, waiting...');
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+    // Wait for SystemConfig if not loaded
+    if (typeof SystemConfig === 'undefined') {
+        let configCheckInterval = setInterval(() => {
+            if (typeof SystemConfig !== 'undefined') {
+                clearInterval(configCheckInterval);
+                console.log('SystemConfig loaded successfully');
+                initializeApp();
+            }
+        }, 100);
+    } else {
+        initializeApp();
+    }
 });
 
 // Initialize application

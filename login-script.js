@@ -1,3 +1,15 @@
+// Wait for SystemConfig to load
+if (typeof SystemConfig === 'undefined') {
+    console.warn('SystemConfig not loaded yet, waiting...');
+    // Wait for SystemConfig to be available
+    let configCheckInterval = setInterval(() => {
+        if (typeof SystemConfig !== 'undefined') {
+            clearInterval(configCheckInterval);
+            console.log('SystemConfig loaded successfully');
+        }
+    }, 100);
+}
+
 // Language Management
 const langData = {
     ar: {
