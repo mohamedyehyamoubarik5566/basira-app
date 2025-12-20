@@ -21,7 +21,7 @@
     "serve": "^14.2.1"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "keywords": [
     "erp",
