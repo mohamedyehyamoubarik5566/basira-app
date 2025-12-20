@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="./style.css" rel="stylesheet">
     <link href="./home-styles.css" rel="stylesheet">
+    <link href="./client-statement-2026.css" rel="stylesheet">
     <link href="./logout-style.css" rel="stylesheet">
     <link href="./report-styles.css" rel="stylesheet">
     <link rel="stylesheet" href="./update-styles.css">
@@ -34,6 +35,9 @@
             window.SystemConfig = SystemConfig;
         }
     </script>
+    
+    <!-- CryptoJS Library for Security -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <!-- Enhanced Core System Files -->
     <script src="./config.js"></script>
@@ -427,93 +431,114 @@
         </div>
     </div>
 
-    <!-- Client Statement Modal -->
+    <!-- Client Statement Modal 2026 -->
     <div class="modal-overlay" id="clientStatementModal">
-        <div class="statement-modal">
-            <div class="modal-header">
-                <h2 id="statementClientName">كشف حساب العميل</h2>
-                <button class="close-btn" onclick="closeStatementModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <!-- Client Balance Summary -->
-            <div class="balance-summary">
-                <div class="balance-card opening">
-                    <div class="balance-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="balance-info">
-                        <h3 id="openingBalance">0 ج.م</h3>
-                        <p>رصيد بداية الفترة</p>
+        <div class="client-statement-2026">
+            <div class="statement-container">
+                <!-- Header -->
+                <div class="statement-header-2026">
+                    <div class="header-content">
+                        <div class="client-info-header">
+                            <div class="client-avatar-large" id="statementClientAvatar">A</div>
+                            <div class="client-details">
+                                <h1 class="client-name-large" id="statementClientName">اسم العميل</h1>
+                                <div class="client-subtitle">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>كشف حساب شامل</span>
+                                    <span id="statementPeriod"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="statement-actions">
+                            <button class="action-btn-2026" onclick="addPaymentToStatement()">
+                                <i class="fas fa-plus"></i>
+                                إضافة دفعة
+                            </button>
+                            <button class="action-btn-2026" onclick="printStatement()">
+                                <i class="fas fa-print"></i>
+                                طباعة
+                            </button>
+                            <button class="action-btn-2026" onclick="closeStatementModal()">
+                                <i class="fas fa-times"></i>
+                                إغلاق
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="balance-card sales">
-                    <div class="balance-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="balance-info">
-                        <h3 id="totalSalesAmount">0 ج.م</h3>
-                        <p>إجمالي المبيعات</p>
+
+                <!-- Balance Overview -->
+                <div class="balance-overview">
+                    <div class="balance-card-2026">
+                        <div class="balance-icon-2026 opening">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="balance-amount" id="openingBalance">0 ج.م</div>
+                        <div class="balance-label">رصيد بداية الفترة</div>
+                    </div>
+                    
+                    <div class="balance-card-2026">
+                        <div class="balance-icon-2026 sales">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="balance-amount" id="totalSalesAmount">0 ج.م</div>
+                        <div class="balance-label">إجمالي المبيعات</div>
+                    </div>
+                    
+                    <div class="balance-card-2026">
+                        <div class="balance-icon-2026 payments">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <div class="balance-amount" id="totalPaymentsAmount">0 ج.م</div>
+                        <div class="balance-label">إجمالي المدفوعات</div>
+                    </div>
+                    
+                    <div class="balance-card-2026">
+                        <div class="balance-icon-2026 current">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="balance-amount" id="currentBalanceAmount">0 ج.م</div>
+                        <div class="balance-label">الرصيد الحالي</div>
                     </div>
                 </div>
-                <div class="balance-card payments">
-                    <div class="balance-icon"><i class="fas fa-money-bill"></i></div>
-                    <div class="balance-info">
-                        <h3 id="totalPaymentsAmount">0 ج.م</h3>
-                        <p>إجمالي المدفوعات</p>
+
+                <!-- Controls -->
+                <div class="statement-controls">
+                    <div class="date-filter-2026">
+                        <label><i class="fas fa-calendar"></i> من تاريخ:</label>
+                        <input type="date" id="statementStartDate" class="date-input-2026">
+                        <label>إلى تاريخ:</label>
+                        <input type="date" id="statementEndDate" class="date-input-2026">
+                        <button class="filter-btn-2026" onclick="filterStatement()">
+                            <i class="fas fa-filter"></i>
+                            تصفية
+                        </button>
                     </div>
                 </div>
-                <div class="balance-card current">
-                    <div class="balance-icon"><i class="fas fa-balance-scale"></i></div>
-                    <div class="balance-info">
-                        <h3 id="currentBalanceAmount">0 ج.م</h3>
-                        <p>الرصيد الحالي</p>
+
+                <!-- Statement Table -->
+                <div class="statement-table-2026">
+                    <div class="table-wrapper-2026">
+                        <table class="modern-table-2026">
+                            <thead>
+                                <tr>
+                                    <th>م</th>
+                                    <th>التاريخ</th>
+                                    <th>النوع</th>
+                                    <th>رقم الإذن</th>
+                                    <th>رقم السيارة</th>
+                                    <th>التكعيب</th>
+                                    <th>سعر المتر</th>
+                                    <th>المبلغ</th>
+                                    <th>الرصيد</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="statementTableBody">
+                                <!-- Statement data will be populated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Statement Controls -->
-            <div class="statement-controls">
-                <div class="date-filter">
-                    <label>من تاريخ:</label>
-                    <input type="date" id="statementStartDate" class="date-input">
-                    <label>إلى تاريخ:</label>
-                    <input type="date" id="statementEndDate" class="date-input">
-                    <button class="modern-btn primary" onclick="filterStatement()">
-                        <i class="fas fa-filter"></i>
-                        تصفية
-                    </button>
-                </div>
-                <div class="statement-actions">
-                    <button class="modern-btn secondary" onclick="addPaymentToStatement()">
-                        <i class="fas fa-plus"></i>
-                        إضافة دفعة
-                    </button>
-                    <button class="modern-btn primary" onclick="printStatement()">
-                        <i class="fas fa-print"></i>
-                        طباعة
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Statement Table -->
-            <div class="statement-table-container">
-                <table class="statement-table">
-                    <thead>
-                        <tr>
-                            <th>م</th>
-                            <th>التاريخ</th>
-                            <th>رقم الإذن</th>
-                            <th>رقم السيارة</th>
-                            <th>رقم المقطورة</th>
-                            <th>التكعيب</th>
-                            <th>سعر المتر</th>
-                            <th>سعر النقلة</th>
-                            <th>الرصيد</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="statementTableBody">
-                        <!-- Statement data will be populated here -->
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
@@ -1767,18 +1792,12 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS functionality replaced with custom code -->
-    <script>
-        // Global Variables with Security
-        let allTodaySales = [];
-        let allClients = [];
-        let allChecks = [];
-        let allVehicleRecords = [];
-        let dailyReportData = [];
-        let allTransactions = [];
-        let currentTransactionType = '';
-        let allPurchases = [];
-        let allSuppliers = [];
+    <!-- Main Application Script -->
+    <script src="./script-main.js"></script>
+    <script src="./script-functions.js"></script>
+    
+</body>
+</html>
         
         // Security: Input sanitization function
         function sanitizeInput(input) {
@@ -3695,35 +3714,41 @@
             const tbody = document.getElementById('statementTableBody');
             
             if (statementData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="text-center">لا توجد بيانات للفترة المحددة</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="no-data-2026"><i class="fas fa-inbox"></i><br>لا توجد بيانات للفترة المحددة</td></tr>';
                 return;
             }
             
             tbody.innerHTML = statementData.map((item, index) => {
                 const date = new Date(item.date).toLocaleDateString('ar-EG');
-                const rowClass = item.type === 'payment' ? 'payment-row' : 'sale-row';
+                const rowClass = item.type === 'payment' ? 'transaction-row payment' : 'transaction-row sale';
                 
                 return `
                 <tr class="${rowClass}">
-                    <td>${index + 1}</td>
-                    <td>${date}</td>
-                    <td>${item.permissionNumber}</td>
-                    <td>${item.carNumber}</td>
-                    <td>${item.trailerNumber}</td>
-                    <td>${item.volume !== '-' ? item.volume + ' م³' : '-'}</td>
-                    <td>${item.pricePerMeter !== '-' ? item.pricePerMeter + ' ج.م' : '-'}</td>
-                    <td class="amount-cell ${item.type}">
-                        ${item.type === 'sale' ? '+' : '-'}${item.amount.toFixed(2)} ج.م
-                    </td>
-                    <td class="balance-cell">${item.runningBalance.toFixed(2)} ج.م</td>
+                    <td><span class="serial-number">${index + 1}</span></td>
+                    <td><span class="date-display">${date}</span></td>
                     <td>
-                        <div class="action-buttons">
+                        <span class="transaction-type-badge ${item.type}">
+                            ${item.type === 'sale' ? 'مبيعة' : 'دفعة'}
+                        </span>
+                    </td>
+                    <td><span class="permission-number">${item.permissionNumber}</span></td>
+                    <td><span class="car-number">${item.carNumber}</span></td>
+                    <td><span class="volume-display">${item.volume !== '-' ? item.volume + ' م³' : '-'}</span></td>
+                    <td><span class="price-display">${item.pricePerMeter !== '-' ? item.pricePerMeter + ' ج.م' : '-'}</span></td>
+                    <td>
+                        <span class="amount-display ${item.type === 'sale' ? 'positive' : 'negative'}">
+                            ${item.type === 'sale' ? '+' : '-'}${item.amount.toFixed(2)} ج.م
+                        </span>
+                    </td>
+                    <td><span class="balance-display">${item.runningBalance.toFixed(2)} ج.م</span></td>
+                    <td>
+                        <div class="action-buttons-2026">
                             ${item.type === 'sale' ? `
-                                <button class="action-btn edit" onclick="editStatementItem('${item.type}', ${item.id})" title="تعديل">
+                                <button class="action-btn-small edit" onclick="editStatementItem('${item.type}', ${item.id})" title="تعديل">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             ` : ''}
-                            <button class="action-btn delete" onclick="deleteStatementItem('${item.type}', ${item.id})" title="حذف">
+                            <button class="action-btn-small delete" onclick="deleteStatementItem('${item.type}', ${item.id})" title="حذف">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -3741,8 +3766,12 @@
         function viewClientStatement(clientName) {
             currentStatementClient = clientName;
             
-            // تحديث عنوان النافذة
-            document.getElementById('statementClientName').textContent = `كشف حساب ${clientName}`;
+            // تحديث عنوان النافذة وصورة العميل
+            document.getElementById('statementClientName').textContent = clientName;
+            const avatar = document.getElementById('statementClientAvatar');
+            if (avatar) {
+                avatar.textContent = clientName.charAt(0).toUpperCase();
+            }
             
             // تعيين التواريخ الافتراضية (آخر 3 شهور)
             const endDate = new Date();
@@ -3751,6 +3780,12 @@
             
             document.getElementById('statementStartDate').value = startDate.toISOString().split('T')[0];
             document.getElementById('statementEndDate').value = endDate.toISOString().split('T')[0];
+            
+            // تحديث فترة العرض
+            const periodElement = document.getElementById('statementPeriod');
+            if (periodElement) {
+                periodElement.textContent = `(${startDate.toLocaleDateString('ar-EG')} - ${endDate.toLocaleDateString('ar-EG')})`;
+            }
             
             // تحميل بيانات كشف الحساب
             loadStatementData(clientName);
@@ -3911,6 +3946,18 @@
             const modal = document.getElementById('clientStatementModal');
             modal.classList.remove('show');
             document.body.style.overflow = 'auto';
+            
+            // تنظيف البيانات
+            currentStatementClient = '';
+            statementData = [];
+            
+            // إعادة تعيين القيم الافتراضية
+            document.getElementById('statementClientName').textContent = 'اسم العميل';
+            document.getElementById('statementClientAvatar').textContent = 'A';
+            document.getElementById('openingBalance').textContent = '0 ج.م';
+            document.getElementById('totalSalesAmount').textContent = '0 ج.م';
+            document.getElementById('totalPaymentsAmount').textContent = '0 ج.م';
+            document.getElementById('currentBalanceAmount').textContent = '0 ج.م';
         }
 
         function filterPageStatement() {

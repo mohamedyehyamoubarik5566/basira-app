@@ -525,7 +525,8 @@ class PerformanceOptimizer {
                     const entries = list.getEntries();
                     entries.forEach(entry => {
                         this.recordMetric('long_task', entry.duration);
-                        if (entry.duration > 100) {
+                        // Only warn for tasks longer than 200ms to reduce noise
+                        if (entry.duration > 200) {
                             console.warn('Long task detected:', entry.duration + 'ms');
                         }
                     });

@@ -80,8 +80,9 @@ const SecurityUtils = {
     // Secure password hashing with salt and multiple iterations
     hashPassword: (password, salt) => {
         try {
+            // Wait for CryptoJS to be available
             if (typeof CryptoJS === 'undefined') {
-                console.warn('CryptoJS not available, using basic hash');
+                console.warn('CryptoJS not yet available, deferring hash operation');
                 return null;
             }
             if (!salt) salt = SecurityUtils.generateSalt();
@@ -202,9 +203,17 @@ const SecurityUtils = {
 
 // Initialize security on load
 if (typeof document !== 'undefined') {
-    document.addEventListener('DOMContentLoaded', SecurityUtils.initializeSecurity);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delay security initialization to ensure CryptoJS is loaded
+        setTimeout(() => {
+            SecurityUtils.initializeSecurity();
+        }, 100);
+    });
 } else {
-    SecurityUtils.initializeSecurity();
+    // For Node.js environment
+    setTimeout(() => {
+        SecurityUtils.initializeSecurity();
+    }, 100);
 }
 
 // Export for use in other files

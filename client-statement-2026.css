@@ -1,0 +1,730 @@
+/* كشف حساب العميل - تصميم 2026 الاحترافي */
+.client-statement-2026 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: 'Cairo', sans-serif;
+}
+
+.statement-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+    backdrop-filter: blur(20px);
+}
+
+.statement-header-2026 {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.statement-header-2026::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.header-content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: center;
+}
+
+.client-info-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.client-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.client-details {
+    flex: 1;
+}
+
+.client-name-large {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.client-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.statement-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.action-btn-2026 {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.action-btn-2026:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.balance-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.balance-card-2026 {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.balance-card-2026:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+}
+
+.balance-card-2026::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+}
+
+.balance-icon-2026 {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    position: relative;
+}
+
+.balance-icon-2026.opening {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.balance-icon-2026.sales {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.balance-icon-2026.payments {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.balance-icon-2026.current {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.balance-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.balance-label {
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.statement-controls {
+    padding: 2rem;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.date-filter-2026 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 15px;
+}
+
+.date-input-2026 {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.date-input-2026:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-btn-2026 {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn-2026:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.statement-table-2026 {
+    background: white;
+    border-radius: 0 0 30px 30px;
+    overflow: hidden;
+}
+
+.table-wrapper-2026 {
+    overflow-x: auto;
+    max-height: 600px;
+}
+
+.modern-table-2026 {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.modern-table-2026 thead {
+    background: linear-gradient(135deg, #1f2937, #374151);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modern-table-2026 th {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modern-table-2026 td {
+    padding: 1.25rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid #f3f4f6;
+    transition: all 0.3s ease;
+}
+
+.modern-table-2026 tbody tr {
+    transition: all 0.3s ease;
+}
+
+.modern-table-2026 tbody tr:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    transform: scale(1.01);
+}
+
+.transaction-row.sale {
+    border-left: 4px solid #10b981;
+}
+
+.transaction-row.payment {
+    border-left: 4px solid #f59e0b;
+}
+
+.amount-display {
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    display: inline-block;
+    min-width: 100px;
+}
+
+.amount-display.positive {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+}
+
+.amount-display.negative {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+}
+
+.balance-display {
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    color: #3730a3;
+}
+
+.transaction-type-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.transaction-type-badge.sale {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.transaction-type-badge.payment {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.action-buttons-2026 {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.action-btn-small {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.action-btn-small.edit {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.action-btn-small.delete {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.action-btn-small:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.no-data-2026 {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+}
+
+.no-data-2026 i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* تحسينات للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .client-statement-2026 {
+        padding: 1rem;
+    }
+    
+    .statement-header-2026 {
+        padding: 2rem 1rem;
+    }
+    
+    .header-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .client-name-large {
+        font-size: 2rem;
+    }
+    
+    .balance-overview {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .statement-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .date-filter-2026 {
+        flex-direction: column;
+    }
+}
+
+/* تأثيرات متقدمة */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.balance-card-2026 {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.balance-card-2026:nth-child(1) { animation-delay: 0.1s; }
+.balance-card-2026:nth-child(2) { animation-delay: 0.2s; }
+.balance-card-2026:nth-child(3) { animation-delay: 0.3s; }
+.balance-card-2026:nth-child(4) { animation-delay: 0.4s; }
+
+/* تأثير الطباعة */
+@media print {
+    .client-statement-2026 {
+        background: white;
+        padding: 0;
+    }
+    
+    .statement-container {
+        box-shadow: none;
+        border-radius: 0;
+    }
+    
+    .statement-actions {
+        display: none;
+    }
+    
+    .statement-controls {
+        display: none;
+    }
+}
+
+/* تحسينات إضافية لكشف الحساب */
+
+/* تأثير الموجة عند النقر */
+.action-btn-2026, .filter-btn-2026, .action-btn-small {
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn-2026::after, .filter-btn-2026::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.action-btn-2026:active::after, .filter-btn-2026:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* تأثير التمرير السلس */
+.table-wrapper-2026 {
+    scroll-behavior: smooth;
+}
+
+/* تحسين شريط التمرير */
+.table-wrapper-2026::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-wrapper-2026::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.table-wrapper-2026::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+}
+
+.table-wrapper-2026::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
+/* تأثير الظل المتحرك للبطاقات */
+.balance-card-2026 {
+    position: relative;
+}
+
+.balance-card-2026::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0);
+    transition: box-shadow 0.3s ease;
+    pointer-events: none;
+}
+
+.balance-card-2026:hover::after {
+    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.3);
+}
+
+/* تأثير النبض للأيقونات */
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.balance-icon-2026 {
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+/* تأثير الإضاءة للصفوف */
+.modern-table-2026 tbody tr {
+    position: relative;
+}
+
+.modern-table-2026 tbody tr::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
+    transition: width 0.3s ease;
+}
+
+.modern-table-2026 tbody tr:hover::before {
+    width: 100%;
+}
+
+/* تحسين الأرقام */
+.balance-amount, .amount-display, .balance-display {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+}
+
+/* تأثير التحميل */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.loading-row {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* تحسين الطباعة */
+@media print {
+    .statement-header-2026 {
+        background: white !important;
+        color: black !important;
+        border-bottom: 3px solid #333;
+    }
+    
+    .statement-header-2026::before {
+        display: none;
+    }
+    
+    .balance-card-2026 {
+        border: 1px solid #ddd;
+        box-shadow: none !important;
+    }
+    
+    .modern-table-2026 thead {
+        background: #f5f5f5 !important;
+        color: black !important;
+    }
+    
+    .action-buttons-2026 {
+        display: none !important;
+    }
+    
+    .transaction-row.sale,
+    .transaction-row.payment {
+        border-left: none !important;
+    }
+}
+
+/* تأثير الانتقال السلس */
+.client-statement-2026 * {
+    transition: all 0.3s ease;
+}
+
+/* تحسين الاستجابة للأجهزة اللوحية */
+@media (max-width: 1024px) {
+    .balance-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .modern-table-2026 {
+        font-size: 0.85rem;
+    }
+    
+    .modern-table-2026 th,
+    .modern-table-2026 td {
+        padding: 1rem 0.5rem;
+    }
+}
+
+/* تحسين للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+    .client-avatar-large {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .client-name-large {
+        font-size: 1.5rem;
+    }
+    
+    .balance-amount {
+        font-size: 1.5rem;
+    }
+    
+    .modern-table-2026 {
+        font-size: 0.75rem;
+    }
+    
+    .action-btn-small {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+    }
+}
+
+/* تأثير الظهور التدريجي */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modern-table-2026 tbody tr {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.modern-table-2026 tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.modern-table-2026 tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.modern-table-2026 tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.modern-table-2026 tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.modern-table-2026 tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+/* تحسين الألوان للوضع المظلم */
+@media (prefers-color-scheme: dark) {
+    .statement-container {
+        background: rgba(30, 41, 59, 0.95);
+    }
+    
+    .balance-card-2026 {
+        background: #1e293b;
+        color: white;
+    }
+    
+    .balance-label {
+        color: #94a3b8;
+    }
+    
+    .statement-controls {
+        background: #1e293b;
+        border-bottom-color: #334155;
+    }
+    
+    .date-filter-2026 {
+        background: #0f172a;
+    }
+    
+    .date-input-2026 {
+        background: #1e293b;
+        color: white;
+        border-color: #334155;
+    }
+    
+    .statement-table-2026 {
+        background: #1e293b;
+    }
+    
+    .modern-table-2026 td {
+        border-bottom-color: #334155;
+    }
+}
