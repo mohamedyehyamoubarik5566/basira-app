@@ -79,15 +79,23 @@ const SecurityUtils = {
 
     // Secure password hashing with salt and multiple iterations
     hashPassword: (password, salt) => {
-        if (typeof CryptoJS === 'undefined') return null;
-        if (!salt) salt = SecurityUtils.generateSalt();
-        
-        let hash = password + salt;
-        // Multiple iterations for security
-        for (let i = 0; i < 10000; i++) {
-            hash = CryptoJS.SHA256(hash).toString();
+        try {
+            if (typeof CryptoJS === 'undefined') {
+                console.warn('CryptoJS not available, using basic hash');
+                return null;
+            }
+            if (!salt) salt = SecurityUtils.generateSalt();
+            
+            let hash = password + salt;
+            // Multiple iterations for security
+            for (let i = 0; i < 10000; i++) {
+                hash = CryptoJS.SHA256(hash).toString();
+            }
+            return { hash, salt };
+        } catch (error) {
+            console.warn('Password hashing failed:', error);
+            return null;
         }
-        return { hash, salt };
     },
 
     validatePassword: (password, storedHash, salt) => {
@@ -160,9 +168,11 @@ const SecurityUtils = {
             // Hash developer key
             if (!AppConfig.security.developerKeyHash) {
                 const devKey = 'ahmedmohamed4112024';
-                const { hash, salt } = SecurityUtils.hashPassword(devKey);
-                AppConfig.security.developerKeyHash = hash;
-                AppConfig.security.developerKeySalt = salt;
+                const hashResult = SecurityUtils.hashPassword(devKey);
+                if (hashResult) {
+                    AppConfig.security.developerKeyHash = hashResult.hash;
+                    AppConfig.security.developerKeySalt = hashResult.salt;
+                }
             }
 
             // Initialize user password hashes
@@ -175,15 +185,17 @@ const SecurityUtils = {
 
             Object.keys(defaultPasswords).forEach(username => {
                 if (!AppConfig.security.users[username].passwordHash) {
-                    const { hash, salt } = SecurityUtils.hashPassword(defaultPasswords[username]);
-                    AppConfig.security.users[username].passwordHash = hash;
-                    AppConfig.security.users[username].salt = salt;
+                    const hashResult = SecurityUtils.hashPassword(defaultPasswords[username]);
+                    if (hashResult) {
+                        AppConfig.security.users[username].passwordHash = hashResult.hash;
+                        AppConfig.security.users[username].salt = hashResult.salt;
+                    }
                 }
             });
 
             console.log('Security configuration initialized');
         } catch (error) {
-            console.error('Failed to initialize security:', error);
+            console.warn('Failed to initialize security:', error.message);
         }
     }
 };

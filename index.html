@@ -2413,6 +2413,17 @@
             }
         }, 100);
         
+        // Add missing function
+        function closeClientPricingModal() {
+            const modal = document.getElementById('clientPricingModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        window.closeClientPricingModal = closeClientPricingModal;
+        
         // إغلاق النافذة بمفتاح Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
