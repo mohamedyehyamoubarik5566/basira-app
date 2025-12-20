@@ -20,7 +20,7 @@ function sanitizeInput(input) {
 function safeGetElement(id) {
     const element = document.getElementById(id);
     if (!element) {
-        console.warn(`Element with id '${id}' not found`);
+        console.warn('Element with id "' + id + '" not found');
     }
     return element;
 }
