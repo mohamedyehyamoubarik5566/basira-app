@@ -363,13 +363,7 @@ function handleDeveloperLogin() {
             showToast('مفتاح المطور غير صحيح', 'error');
             return;
         }
-    } else {
-        // Fallback validation (less secure)
-        if (devKey !== 'ahmedmohamed4112024') {
-            showToast('مفتاح المطور غير صحيح', 'error');
-            return;
-        }
-    }
+        
         // Create secure session for developer
         const sessionData = {
             username: 'developer',
@@ -396,7 +390,37 @@ function handleDeveloperLogin() {
             window.location.href = 'control-panel.html';
         }, 1500);
     } else {
-        showToast('مفتاح المطور غير صحيح', 'error');
+        // Fallback validation (less secure)
+        if (devKey !== 'ahmedmohamed4112024') {
+            showToast('مفتاح المطور غير صحيح', 'error');
+            return;
+        }
+        
+        // Create secure session for developer
+        const sessionData = {
+            username: 'developer',
+            role: 'admin',
+            companyCode: 'DEV',
+            loginTime: new Date().toISOString(),
+            sessionId: 'dev_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            permissions: ['all'],
+            loginMethod: 'developer_key'
+        };
+        
+        // Use secure session management if available
+        if (window.securityManager) {
+            window.securityManager.createSecureSession(sessionData);
+            window.securityManager.recordSecurityAttempt('developer', true, {
+                attemptType: 'developer_login'
+            });
+        } else {
+            localStorage.setItem('currentUser', JSON.stringify(sessionData));
+        }
+        
+        showToast('مرحباً بك في لوحة الإدارة الرئيسية', 'success');
+        setTimeout(() => {
+            window.location.href = 'control-panel.html';
+        }, 1500);
     }
 }
 
